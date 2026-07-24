@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="AI-powered symptom checker for health information and possible condition prediction."
+    >
+
+    <title>
+        Healthcare Plus | AI Symptom Checker
+    </title>
+
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header">
+
+        <div class="header-content">
+
+            <div class="logo">
+
+                <span>
+                    Healthcare Plus
+                </span>
+
+            </div>
+
+
+            <div class="header-subtitle">
+
+                AI-Powered Health Information Assistant
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================
+         MAIN
+    ========================================== -->
+
+    <main class="container">
+
+
+        <!-- =====================================
+             HERO SECTION
+        ====================================== -->
+
+        <section class="hero">
+
+            <div class="hero-badge">
+
+                AI-Powered Health Assistant
+
+            </div>
+
+
+            <h1>
+
+                Understand Your Symptoms
+
+                <span class="gradient-text">
+                    Smarter & Faster
+                </span>
+
+            </h1>
+
+
+            <p>
+
+                Select the symptoms you are experiencing
+                and our machine learning-powered system
+                will provide possible health conditions
+                based on your selected symptoms.
+
+            </p>
+
+        </section>
+
+
+
+        <!-- =====================================
+             SYMPTOM CHECKER CARD
+        ====================================== -->
+
+        <section class="card symptom-card">
+
+
+            <!-- Card Header -->
+
+            <div class="card-heading">
+
+                <div>
+
+                    <h2>
+
+                        Select Your Symptoms
+
+                    </h2>
+
+                    <p class="helper-text">
+
+                        Choose one or more symptoms
+                        from the list below.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================
+                 SEARCH
+            ================================== -->
+
+            <div class="search-wrapper">
+
+                <input
+
+                    type="text"
+
+                    id="symptomSearch"
+
+                    class="search-box"
+
+                    placeholder="Search for symptoms..."
+
+                    autocomplete="off"
+
+                >
+
+            </div>
+
+
+
+            <!-- =================================
+                 SELECTED SYMPTOMS
+            ================================== -->
+
+            <div class="selected-header">
+
+                <h3>
+
+                    Selected Symptoms
+
+                </h3>
+
+                <span
+                    id="selectedCount"
+                    class="selected-count"
+                >
+
+                    0 selected
+
+                </span>
+
+            </div>
+
+
+            <div
+                id="selectedSymptoms"
+                class="selected-symptoms"
+            >
+
+                <p class="empty-message">
+
+                    No symptoms selected yet.
+                    Select symptoms from the list below.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================
+                 ALL SYMPTOMS
+            ================================== -->
+
+            <div class="symptoms-header">
+
+                <h3>
+
+                    Available Symptoms
+
+                </h3>
+
+                <span class="symptoms-hint">
+
+                    Click to select
+
+                </span>
+
+            </div>
+
+
+            <div
+                id="symptomsList"
+                class="symptoms-list"
+            >
+
+                <p class="loading-symptoms">
+
+                    Loading symptoms...
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================
+                 PREDICT BUTTON
+            ================================== -->
+
+            <button
+
+                id="predictButton"
+
+                class="predict-button"
+
+            >
+
+                Check Possible Condition
+
+            </button>
+
+
+
+            <!-- =================================
+                 LOADING
+            ================================== -->
+
+            <div
+                id="loading"
+                class="loading hidden"
+            >
+
+                <span class="loading-spinner"></span>
+
+                <span>
+                    Analyzing your symptoms...
+                </span>
+
+            </div>
+
+
+
+            <!-- =================================
+                 ERROR
+            ================================== -->
+
+            <div
+                id="errorMessage"
+                class="error-message hidden"
+            >
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             RESULTS SECTION
+        ====================================== -->
+
+        <section
+            id="resultsSection"
+            class="results-section hidden"
+        >
+
+
+            <!-- =================================
+                 RESULT HEADER
+            ================================== -->
+
+            <div class="results-heading">
+
+                <span class="results-badge">
+
+                    Analysis Complete
+
+                </span>
+
+
+                <h2>
+
+                    Your Prediction Results
+
+                </h2>
+
+
+                <p>
+
+                    Based on the symptoms you selected,
+                    here is the prediction generated
+                    by the system.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================
+                 MAIN PREDICTION
+            ================================== -->
+
+            <div class="result-card primary-result">
+
+
+                <p class="result-label">
+
+                    Most Likely Condition
+
+                </p>
+
+
+                <h1
+                    id="predictedDisease"
+                    class="disease-name"
+                >
+
+                    --
+
+                </h1>
+
+
+                <div class="confidence-box">
+
+                    <span>
+
+                        Prediction Confidence
+
+                    </span>
+
+
+                    <strong
+                        id="confidence"
+                    >
+
+                        --
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================
+                 TOP PREDICTIONS
+            ================================== -->
+
+            <div class="result-card">
+
+
+                <div class="result-card-header">
+
+                    <div>
+
+                        <h2>
+
+                            Top Possible Conditions
+
+                        </h2>
+
+                        <p>
+
+                            Other conditions considered
+                            by the prediction system.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="topPredictions"
+                    class="top-predictions"
+                >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================
+                 ABOUT CONDITION
+            ================================== -->
+
+            <div class="result-card">
+
+
+                <div class="result-card-header">
+
+                    <div>
+
+                        <h2>
+
+                            About This Condition
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p
+                    id="description"
+                    class="result-text"
+                >
+
+                    --
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================
+                 PRECAUTIONS
+            ================================== -->
+
+            <div class="result-card">
+
+
+                <div class="result-card-header">
+
+                    <div>
+
+                        <h2>
+
+                            General Precautions
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p
+                    id="precautions"
+                    class="result-text"
+                >
+
+                    --
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================
+                 SPECIALIST
+            ================================== -->
+
+            <div class="result-card specialist-card">
+
+
+                <div class="result-card-header">
+
+                    <div>
+
+                        <h2>
+
+                            Recommended Specialist
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p
+                    id="specialist"
+                    class="specialist"
+                >
+
+                    --
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================
+                 DISCLAIMER
+            ================================== -->
+
+            <div class="disclaimer">
+
+
+                <div>
+
+                    <strong>
+
+                        Important Medical Disclaimer
+
+                    </strong>
+
+
+                    <p
+                        id="disclaimer"
+                    >
+
+                        This tool is designed for
+                        educational and informational
+                        purposes only. It is not a
+                        substitute for professional
+                        medical diagnosis, treatment,
+                        or medical advice.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="footer">
+
+
+        <div class="footer-container">
+
+
+            <!-- Footer Brand -->
+
+            <div class="footer-brand">
+
+
+                <div class="footer-logo">
+
+                    Healthcare Plus
+
+                </div>
+
+
+                <p>
+
+                    An AI-powered health information
+                    assistant designed to help users
+                    understand possible health conditions
+                    based on reported symptoms.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- Footer Divider -->
+
+            <div class="footer-divider"></div>
+
+
+
+            <!-- Footer Bottom -->
+
+            <div class="footer-bottom">
+
+
+                <p>
+
+                    © 2026 Healthcare Plus.
+                    All rights reserved.
+
+                </p>
+
+
+                <p class="footer-note">
+
+                    Machine Learning Based
+                    Health Information Tool
+
+                </p>
+
+            </div>
+
+
+            <!-- Footer Disclaimer -->
+
+            <div class="footer-disclaimer">
+
+                This platform provides informational
+                predictions only and should not be used
+                as a replacement for professional
+                medical consultation.
+
+            </div>
+
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>
