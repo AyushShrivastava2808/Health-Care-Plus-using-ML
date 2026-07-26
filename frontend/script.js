@@ -51,11 +51,8 @@ async function loadSymptoms() {
         symptomsList.innerHTML =
             "<p>Loading symptoms...</p>";
 
-
-        const response = await fetch(
-            `${API_URL}/symptoms`
-        );
-
+        const response =
+            await fetch(`${API_URL}/symptoms`);
 
         if (!response.ok) {
 
@@ -65,26 +62,25 @@ async function loadSymptoms() {
 
         }
 
-
         const data =
             await response.json();
 
-
+        // Safe check
         allSymptoms =
-            data.symptoms;
-
+            Array.isArray(data.symptoms)
+                ? data.symptoms
+                : [];
 
         displaySymptoms(
             allSymptoms
         );
 
-
     } catch (error) {
 
         console.error(
+            "Symptoms Loading Error:",
             error
         );
-
 
         symptomsList.innerHTML =
             `
@@ -111,8 +107,8 @@ function displaySymptoms(
     symptomsList.innerHTML =
         "";
 
-
     if (
+        !Array.isArray(symptoms) ||
         symptoms.length === 0
     ) {
 
@@ -127,26 +123,21 @@ function displaySymptoms(
 
     }
 
-
     symptoms.forEach(
         symptom => {
-
 
             const symptomItem =
                 document.createElement(
                     "div"
                 );
 
-
             symptomItem.className =
                 "symptom-item";
-
 
             symptomItem.textContent =
                 formatSymptomName(
                     symptom
                 );
-
 
             symptomItem.dataset.symptom =
                 symptom;
@@ -199,7 +190,15 @@ function formatSymptomName(
     symptom
 ) {
 
-    return symptom
+    if (
+        !symptom
+    ) {
+
+        return "";
+
+    }
+
+    return String(symptom)
 
         .replace(
             /_/g,
@@ -241,7 +240,6 @@ function toggleSymptom(
 
     }
 
-
     updateSelectedSymptoms();
 
     displaySymptoms(
@@ -260,7 +258,6 @@ function updateSelectedSymptoms() {
     selectedSymptomsContainer.innerHTML =
         "";
 
-
     if (
         selectedSymptoms.size === 0
     ) {
@@ -276,20 +273,16 @@ function updateSelectedSymptoms() {
 
     }
 
-
     selectedSymptoms.forEach(
         symptom => {
-
 
             const tag =
                 document.createElement(
                     "span"
                 );
 
-
             tag.className =
                 "selected-tag";
-
 
             tag.textContent =
                 `${formatSymptomName(
@@ -330,7 +323,6 @@ symptomSearch.addEventListener(
 
         const filteredSymptoms =
             getFilteredSymptoms();
-
 
         displaySymptoms(
             filteredSymptoms
@@ -444,9 +436,23 @@ async function predictDisease() {
             );
 
 
-        const data =
-            await response.json();
+        // Try to read JSON safely
 
+        let data = {};
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            data = {};
+
+        }
+
+
+        // Backend error
 
         if (
             !response.ok
@@ -456,8 +462,23 @@ async function predictDisease() {
 
                 data.message
                 ||
+                data.error
+                ||
                 "Prediction failed."
 
+            );
+
+        }
+
+
+        // Check if backend returned data
+
+        if (
+            !data
+        ) {
+
+            throw new Error(
+                "Backend returned an empty response."
             );
 
         }
@@ -473,6 +494,7 @@ async function predictDisease() {
     } catch (error) {
 
         console.error(
+            "Prediction Error:",
             error
         );
 
@@ -508,12 +530,20 @@ function displayResults(
     // Main Prediction
     // ======================================
 
+    const predictedDisease =
+        data.predicted_disease
+        ||
+        data.prediction
+        ||
+        "Unknown Condition";
+
+
     document.getElementById(
         "predictedDisease"
     ).textContent =
 
         formatDiseaseName(
-            data.predicted_disease
+            predictedDisease
         );
 
 
@@ -521,40 +551,73 @@ function displayResults(
     // Confidence
     // ======================================
 
+    const confidenceValue =
+        data.confidence
+        ??
+        0;
+
+
     document.getElementById(
         "confidence"
     ).textContent =
 
-        `${data.confidence}%`;
+        `${confidenceValue}%`;
 
 
     // ======================================
     // Disease Information
     // ======================================
 
-    const information =
-        data.disease_information;
+    /*
+        IMPORTANT FIX:
 
+        Backend may sometimes return:
+        data.disease_information = undefined
+
+        So we use a fallback object.
+    */
+
+    const information =
+        data.disease_information
+        ||
+        data.disease_info
+        ||
+        {};
+
+
+    // Description
 
     document.getElementById(
         "description"
     ).textContent =
 
-        information.description;
+        information.description
+        ||
+        "No detailed information is available for this condition.";
 
+
+    // Precautions
 
     document.getElementById(
         "precautions"
     ).textContent =
 
-        information.precautions;
+        information.precautions
+        ||
+        "Please consult a qualified healthcare professional for appropriate medical advice.";
 
+
+    // Specialist
 
     document.getElementById(
         "specialist"
     ).textContent =
 
-        information.recommended_specialist;
+        information.recommended_specialist
+        ||
+        information.specialist
+        ||
+        "General Physician";
 
 
     // ======================================
@@ -565,7 +628,9 @@ function displayResults(
         "disclaimer"
     ).textContent =
 
-        data.disclaimer;
+        data.disclaimer
+        ||
+        "This tool is for educational/informational purposes and is not a substitute for professional medical diagnosis.";
 
 
     // ======================================
@@ -582,49 +647,88 @@ function displayResults(
         "";
 
 
-    data.top_predictions.forEach(
-        (
-            prediction,
-            index
-        ) => {
+    const predictions =
+        Array.isArray(
+            data.top_predictions
+        )
+            ? data.top_predictions
+            : [];
 
 
-            const predictionItem =
-                document.createElement(
-                    "div"
+    if (
+        predictions.length === 0
+    ) {
+
+        topPredictions.innerHTML =
+            `
+            <p>
+                No additional predictions available.
+            </p>
+            `;
+
+    } else {
+
+        predictions.forEach(
+            (
+                prediction,
+                index
+            ) => {
+
+
+                const predictionItem =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                predictionItem.className =
+                    "prediction-item";
+
+
+                const disease =
+                    prediction.disease
+                    ||
+                    prediction.condition
+                    ||
+                    "Unknown Condition";
+
+
+                const probability =
+                    prediction.probability
+                    ??
+                    prediction.confidence
+                    ??
+                    0;
+
+
+                predictionItem.innerHTML =
+
+                    `
+                    <span>
+
+                        ${index + 1}.
+                        ${formatDiseaseName(
+                            disease
+                        )}
+
+                    </span>
+
+                    <strong>
+
+                        ${probability}%
+
+                    </strong>
+                    `;
+
+
+                topPredictions.appendChild(
+                    predictionItem
                 );
 
+            }
+        );
 
-            predictionItem.className =
-                "prediction-item";
-
-
-            predictionItem.innerHTML =
-
-                `
-                <span>
-
-                    ${index + 1}.
-                    ${formatDiseaseName(
-                        prediction.disease
-                    )}
-
-                </span>
-
-                <strong>
-
-                    ${prediction.probability}%
-
-                </strong>
-                `;
-
-
-            topPredictions.appendChild(
-                predictionItem
-            );
-
-        }
-    );
+    }
 
 
     // ======================================
@@ -636,7 +740,9 @@ function displayResults(
     );
 
 
+    // ======================================
     // Scroll to Results
+    // ======================================
 
     resultsSection.scrollIntoView({
 
@@ -659,11 +765,26 @@ function formatDiseaseName(
     disease
 ) {
 
-    return disease
+    if (
+        !disease
+    ) {
+
+        return "Unknown Condition";
+
+    }
+
+    return String(disease)
+
+        .replace(
+            /_/g,
+            " "
+        )
+
         .replace(
             /\s+/g,
             " "
         )
+
         .trim();
 
 }
